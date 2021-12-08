@@ -14,12 +14,20 @@ package ext
 import (
 	"github.com/pkg/errors"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
-	"github.com/zerotohero-dev/fizz-mtls/pkg/mtls"
 )
 
 // FizzBuzz.Pro Extensions
 
-func AnyId(args mtls.SpireArgs) ([]spiffeid.ID, error) {
+type SpireArgs struct {
+	AppPrefix      string
+	AppNameDefault string
+	AppName        string
+	AppNameIdm     string
+	AppNameMailer  string
+	AppTrustDomain string
+}
+
+func AnyId(args SpireArgs) ([]spiffeid.ID, error) {
 	anyId, err := spiffeid.New(
 		args.AppTrustDomain, args.AppPrefix, args.AppNameDefault,
 	)
@@ -31,7 +39,7 @@ func AnyId(args mtls.SpireArgs) ([]spiffeid.ID, error) {
 	return []spiffeid.ID{anyId}, nil
 }
 
-func Idm(args mtls.SpireArgs) ([]spiffeid.ID, error) {
+func Idm(args SpireArgs) ([]spiffeid.ID, error) {
 	appId, err := spiffeid.New(
 		args.AppTrustDomain, args.AppPrefix, args.AppNameIdm,
 	)
@@ -42,7 +50,7 @@ func Idm(args mtls.SpireArgs) ([]spiffeid.ID, error) {
 	return []spiffeid.ID{appId}, nil
 }
 
-func AllowList(args mtls.SpireArgs, allowAll bool) ([]spiffeid.ID, error) {
+func AllowList(args SpireArgs, allowAll bool) ([]spiffeid.ID, error) {
 	if allowAll {
 		res, err := AnyId(args)
 		if err != nil {

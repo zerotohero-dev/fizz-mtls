@@ -21,15 +21,6 @@ import (
 	"net"
 )
 
-type SpireArgs struct {
-	AppPrefix      string
-	AppNameDefault string
-	AppName        string
-	AppNameIdm     string
-	AppNameMailer  string
-	AppTrustDomain string
-}
-
 func ListenAndServe(
 	serverAddress, socketPath, appName string,
 	allowedIds []spiffeid.ID,
