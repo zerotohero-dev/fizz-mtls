@@ -30,6 +30,7 @@ type SpireArgs struct {
 	AppTrustDomain string
 }
 
+// TODO: domain-specific logic; move elsewhere.
 func AnyId(args SpireArgs) ([]spiffeid.ID, error) {
 	anyId, err := spiffeid.New(
 		args.AppTrustDomain, args.AppPrefix, args.AppNameDefault,
@@ -42,6 +43,7 @@ func AnyId(args SpireArgs) ([]spiffeid.ID, error) {
 	return []spiffeid.ID{anyId}, nil
 }
 
+// TODO: domain-specific logic; move elsewhere.
 func FromIdm(args SpireArgs) ([]spiffeid.ID, error) {
 	appId, err := spiffeid.New(
 		args.AppTrustDomain, args.AppPrefix, args.AppNameIdm,
@@ -54,12 +56,9 @@ func FromIdm(args SpireArgs) ([]spiffeid.ID, error) {
 }
 
 func ListenAndServe(
-	serverAddress, socketPath string,
-	spireArgs SpireArgs,
+	serverAddress, socketPath, appName string,
 	allowedIds []spiffeid.ID,
-	svc func() interface{},
-	handlerFn func(net.Conn, interface{}),
-	errFn func(error),
+	handlerFn func(net.Conn), errFn func(error),
 ) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -79,7 +78,7 @@ func ListenAndServe(
 
 	log.Info(
 		"SPIRE: 🐢 Service '%s' is waiting for mTLS connections at '%s",
-		spireArgs.AppName, serverAddress,
+		appName, serverAddress,
 	)
 
 	defer func() {
@@ -96,6 +95,6 @@ func ListenAndServe(
 			go errFn(err)
 			continue
 		}
-		go handlerFn(conn, svc)
+		go handlerFn(conn)
 	}
 }
