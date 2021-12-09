@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/zerotohero-dev/fizz-entity/pkg/reqres"
+	"net"
 )
 
 // FizzBuzz.Pro Extensions
@@ -78,4 +79,13 @@ func Payload(request string) (string, error) {
 
 	body := req.Body
 	return body, nil
+}
+
+func Send(conn net.Conn, result interface{}) error {
+	serialized, _ := json.Marshal(result)
+	if _, err := conn.Write([]byte(string(serialized) + "\n")); err != nil {
+		return errors.Wrap(err, "Unable to send a response")
+	}
+
+	return nil
 }
