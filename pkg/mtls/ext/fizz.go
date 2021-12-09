@@ -12,8 +12,10 @@
 package ext
 
 import (
+	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
+	"github.com/zerotohero-dev/fizz-entity/pkg/reqres"
 )
 
 // FizzBuzz.Pro Extensions
@@ -64,4 +66,16 @@ func AllowList(args SpireArgs, allowAll bool) ([]spiffeid.ID, error) {
 		return []spiffeid.ID{}, errors.Wrap(err, "problem generating allow list")
 	}
 	return res, nil
+}
+
+func Payload(request string) (string, error) {
+	var req reqres.MtlsApiRequest
+
+	err := json.Unmarshal([]byte(request), &req)
+	if err != nil {
+		return "", errors.Wrap(err, "payload: problem with unmarshal")
+	}
+
+	body := req.Body
+	return body, nil
 }
